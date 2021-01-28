@@ -7,7 +7,7 @@ trait UsesTmpDir
     protected $DEFAULT_TMP_DIR = __DIR__.'/tmp';
 
     public function tmpDir() {
-        return getenv('FLARUM_TEST_TMP_DIR_LOCAL') ?: getenv('FLARUM_TEST_TMP_DIR') ?: static::$DEFAULT_TMP_DIR;
+        return realpath(getenv('FLARUM_TEST_TMP_DIR_LOCAL') ?: getenv('FLARUM_TEST_TMP_DIR') ?: static::$DEFAULT_TMP_DIR);
     }
 
     public function setupTmpDir() {
@@ -30,14 +30,16 @@ trait UsesTmpDir
         $tmpDir = $this->tmpDir();
 
         foreach ($DIRS_NEEDED as $path) {
-            if (!file_exists($tmpDir.$path)) {
-                mkdir($tmpDir.$path);
+            $fullPath = realpath($tmpDir.$path);
+            if (!file_exists($fullPath)) {
+                mkdir($fullPath);
             }
         }
 
         foreach ($FILES_NEEDED as $path => $contents) {
-            if (!file_exists($tmpDir.$path)) {
-                file_put_contents($tmpDir.$path, $contents);
+            $fullPath = realpath($tmpDir . $path);
+            if (!file_exists($fullPath)) {
+                file_put_contents($fullPath, $contents);
             }
         }
     }
