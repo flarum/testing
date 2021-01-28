@@ -98,7 +98,7 @@ class SetupScript
                 'base' => $tmp,
                 'public' => "$tmp/public",
                 'storage' => "$tmp/storage",
-                'vendor' => __DIR__.'/../../../../../',
+                'vendor' => getcwd().'/vendor',
             ])
         );
 

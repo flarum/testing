@@ -53,9 +53,9 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
                     'base' => $tmp,
                     'public' => "$tmp/public",
                     'storage' => "$tmp/storage",
-                    'vendor' => __DIR__ . '/../../../../',
+                    'vendor' => getcwd().'/vendor',
                 ]),
-                new Config(include __DIR__ . "$tmp/config.php")
+                new Config(include "$tmp/config.php")
             );
 
             $extenders = array_merge([
