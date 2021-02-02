@@ -4,10 +4,8 @@ namespace Flarum\Testing\integration;
 
 trait UsesTmpDir
 {
-    protected $DEFAULT_TMP_DIR = __DIR__.'/tmp';
-
     public function tmpDir() {
-        return realpath(getenv('FLARUM_TEST_TMP_DIR_LOCAL') ?: getenv('FLARUM_TEST_TMP_DIR') ?: static::$DEFAULT_TMP_DIR);
+        return realpath(getenv('FLARUM_TEST_TMP_DIR_LOCAL') ?: getenv('FLARUM_TEST_TMP_DIR') ?: __DIR__.'/tmp');
     }
 
     public function setupTmpDir() {
