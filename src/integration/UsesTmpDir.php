@@ -5,7 +5,7 @@ namespace Flarum\Testing\integration;
 trait UsesTmpDir
 {
     public function tmpDir() {
-        return realpath(getenv('FLARUM_TEST_TMP_DIR_LOCAL') ?: getenv('FLARUM_TEST_TMP_DIR') ?: __DIR__.'/tmp');
+        return getenv('FLARUM_TEST_TMP_DIR_LOCAL') ?: getenv('FLARUM_TEST_TMP_DIR') ?: __DIR__.'/tmp';
     }
 
     public function setupTmpDir() {
@@ -28,14 +28,14 @@ trait UsesTmpDir
         $tmpDir = $this->tmpDir();
 
         foreach ($DIRS_NEEDED as $path) {
-            $fullPath = realpath($tmpDir.$path);
+            $fullPath = $tmpDir.$path;
             if (!file_exists($fullPath)) {
                 mkdir($fullPath);
             }
         }
 
         foreach ($FILES_NEEDED as $path => $contents) {
-            $fullPath = realpath($tmpDir . $path);
+            $fullPath = $tmpDir.$path;
             if (!file_exists($fullPath)) {
                 file_put_contents($fullPath, $contents);
             }
