@@ -15,6 +15,7 @@ use Flarum\Install\BaseUrl;
 use Flarum\Install\DatabaseConfig;
 use Flarum\Install\Installation;
 use Flarum\Testing\integration\UsesTmpDir;
+use mysqli;
 
 class SetupScript
 {
@@ -77,6 +78,7 @@ class SetupScript
         $tmp = $this->tmpDir();
 
         echo "Connecting to database $this->name at $this->host:$this->port.\n";
+        echo "Warning: all tables will be dropped to ensure clean state. DO NOT use your production database!\n";
         echo "Logging in as $this->user with password '$this->pass'.\n";
         echo "Table prefix: '$this->pref'\n";
         echo "\nStoring test config in '$tmp'\n";
@@ -90,6 +92,10 @@ class SetupScript
         sleep(4);
 
         echo "\nOff we go...\n";
+
+        echo "\nDropping all existing DB tables to ensure clean state\n";
+        $this->dropDbTables();
+        echo "Success! Proceeding to installation...\n";
 
         $this->setupTmpDir();
 
@@ -122,5 +128,20 @@ class SetupScript
         $pipeline->run();
 
         echo "Installation complete\n";
+    }
+
+    // Copied from https://stackoverflow.com/questions/3493253/how-to-drop-all-tables-in-database-without-dropping-the-database-itself/3493398
+    protected function dropDbTables()
+    {
+        $mysqli = new mysqli($this->host, $this->user, $this->pass, $this->name);
+        $mysqli->query('SET foreign_key_checks = 0');
+        if ($result = $mysqli->query("SHOW TABLES")) {
+            while ($row = $result->fetch_array(MYSQLI_NUM)) {
+                $mysqli->query('DROP TABLE IF EXISTS ' . $row[0]);
+            }
+        }
+
+        $mysqli->query('SET foreign_key_checks = 1');
+        $mysqli->close();
     }
 }
