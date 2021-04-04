@@ -26,6 +26,12 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
     use UsesTmpDir;
 
     /**
+     * Should migrations from extensions be run down before running test cases?
+     * This will ensure a cleaner state, but also significantly slow down tests.
+     */
+    static $rollbackExtensionMigrations = false;
+
+    /**
      * @inheritDoc
      */
     protected function tearDown(): void
@@ -59,7 +65,7 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
             );
 
             $extenders = array_merge([
-                new OverrideExtensionManagerForTests($this->extensions)
+                new OverrideExtensionManagerForTests($this->extensions, static::$rollbackExtensionMigrations)
             ], $this->extenders);
 
             $site->extendWith($extenders);
