@@ -14,8 +14,8 @@ use Flarum\Install\AdminUser;
 use Flarum\Install\BaseUrl;
 use Flarum\Install\DatabaseConfig;
 use Flarum\Install\Installation;
+use Flarum\Install\Steps\ConnectToDatabase;
 use Flarum\Testing\integration\UsesTmpDir;
-use mysqli;
 
 class SetupScript
 {
@@ -63,6 +63,11 @@ class SetupScript
      */
     protected $pref;
 
+    /**
+     * @var DatabaseConfig
+     */
+    private $dbConfig;
+
     public function __construct()
     {
         $this->host = getenv('DB_HOST') ?: 'localhost';
@@ -93,8 +98,10 @@ class SetupScript
 
         echo "\nOff we go...\n";
 
-        echo "\nDropping all existing DB tables to ensure clean state\n";
-        $this->dropDbTables();
+        $this->dbConfig = new DatabaseConfig('mysql', $this->host, $this->port, $this->name, $this->user, $this->pass, $this->pref);
+
+        echo "\nWiping DB to ensure clean state\n";
+        $this->wipeDb();
         echo "Success! Proceeding to installation...\n";
 
         $this->setupTmpDir();
@@ -104,7 +111,7 @@ class SetupScript
                 'base' => $tmp,
                 'public' => "$tmp/public",
                 'storage' => "$tmp/storage",
-                'vendor' => getcwd().'/vendor',
+                'vendor' => getcwd() . '/vendor',
             ])
         );
 
@@ -112,9 +119,7 @@ class SetupScript
             ->configPath('config.php')
             ->debugMode(true)
             ->baseUrl(BaseUrl::fromString('http://localhost'))
-            ->databaseConfig(
-                new DatabaseConfig('mysql', $this->host, $this->port, $this->name, $this->user, $this->pass, $this->pref)
-            )
+            ->databaseConfig($this->dbConfig)
             ->adminUser(new AdminUser(
                 'admin',
                 'password',
@@ -130,18 +135,15 @@ class SetupScript
         echo "Installation complete\n";
     }
 
-    // Copied from https://stackoverflow.com/questions/3493253/how-to-drop-all-tables-in-database-without-dropping-the-database-itself/3493398
-    protected function dropDbTables()
+    protected function wipeDb()
     {
-        $mysqli = new mysqli($this->host, $this->user, $this->pass, $this->name);
-        $mysqli->query('SET foreign_key_checks = 0');
-        if ($result = $mysqli->query("SHOW TABLES")) {
-            while ($row = $result->fetch_array(MYSQLI_NUM)) {
-                $mysqli->query('DROP TABLE IF EXISTS ' . $row[0]);
-            }
-        }
+        // Reuse the connection step to include version checks
+        (new ConnectToDatabase($this->dbConfig, function ($db) {
+            // Inspired by Laravel's db:wipe
+            $builder = $db->getSchemaBuilder();
 
-        $mysqli->query('SET foreign_key_checks = 1');
-        $mysqli->close();
+            $builder->dropAllTables();
+            $builder->dropAllViews();
+        }))->run();
     }
 }
