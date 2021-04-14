@@ -54,7 +54,7 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
             $config = include "$tmp/config.php";
 
             foreach ($this->config as $key => $value) {
-                Arr::set($configFromFile, $key, $value);
+                Arr::set($config, $key, $value);
             }
 
             $site = new InstalledSite(
