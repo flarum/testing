@@ -133,6 +133,18 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
      * offer a way to set them at runtime, so this method lets you
      * add/override them before boot.
      * 
+     * You can use dot-separated syntax to assign values to subarrays.
+     * 
+     * For example:
+     * 
+     * `$this->config('a.b.c', 'value');` will result in the following:
+     * 
+     * [
+     *     'a' => [
+     *         'b' => ['c' => 'value']
+     *     ]
+     * ]
+     * 
      * Note that this method will have no effect if called after the
      * application is booted.
      */

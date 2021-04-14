@@ -65,11 +65,13 @@ class TestCaseTest extends TestCase
     {
         $this->config('hello', 'world');
         $this->config('url', 'https://flarum.org');
+        $this->config('level1.level2', 'value');
 
         $config = $this->app()->getContainer()->make(Config::class);
 
         $this->assertEquals('world', $config['hello']);
         $this->assertEquals('https://flarum.org', $config['url']);
+        $this->assertEquals('value', $config['level1']['level2']);
     }
 
     /**
@@ -81,6 +83,7 @@ class TestCaseTest extends TestCase
 
         $this->assertEquals(null, $config['hello']);
         $this->assertEquals('http://localhost', $config['url']);
+        $this->assertFalse(isset($config['level1']['level2']));
     }
 
     /**
