@@ -47,7 +47,7 @@ class TestCaseTest extends TestCase
         $this->assertEquals('something_other_than_username', $settings->get('display_name_driver'));
     }
 
-   #[Test]
+    #[Test]
     public function settings_cleaned_up_from_previous_method()
     {
         $settings = $this->app()->getContainer()->make(SettingsRepositoryInterface::class);
