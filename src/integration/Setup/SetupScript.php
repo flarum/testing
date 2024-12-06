@@ -38,7 +38,7 @@ class SetupScript
 
     public function __construct()
     {
-        $this->driver = getenv('DB_DRIVER') ?: 'mysql';
+        $this->driver = getenv('DB_DRIVER') ?: 'sqlite';
         $this->host = getenv('DB_HOST') ?: 'localhost';
         $this->port = intval(getenv('DB_PORT') ?: match ($this->driver) {
             'mysql', 'mariadb' => 3306,
